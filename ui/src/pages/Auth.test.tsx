@@ -11,6 +11,7 @@ import { AuthPage } from "./Auth";
 const getSessionMock = vi.hoisted(() => vi.fn());
 const signInEmailMock = vi.hoisted(() => vi.fn());
 const signUpEmailMock = vi.hoisted(() => vi.fn());
+const signInGoogleMock = vi.hoisted(() => vi.fn());
 const healthMock = vi.hoisted(() => vi.fn());
 const beginCloudSignInMock = vi.hoisted(() => vi.fn());
 
@@ -25,6 +26,7 @@ vi.mock("../api/auth", () => ({
     getSession: () => getSessionMock(),
     signInEmail: (input: unknown) => signInEmailMock(input),
     signUpEmail: (input: unknown) => signUpEmailMock(input),
+    signInGoogle: (input: unknown) => signInGoogleMock(input),
   },
 }));
 
@@ -308,5 +310,37 @@ describe("AuthPage", () => {
     await act(async () => {
       root.unmount();
     });
+  });
+
+  it("offers Google sign-in only when the instance enables it", async () => {
+    const hidden = await mount();
+    expect(container.textContent).not.toContain("Continue with Google");
+    await act(() => hidden.root.unmount());
+
+    healthMock.mockResolvedValue({ status: "ok", deploymentMode: "authenticated", googleSignInEnabled: true });
+    // Never resolves, so the test never navigates the jsdom window.
+    signInGoogleMock.mockReturnValue(new Promise(() => {}));
+    const { root } = await mount("/auth?next=%2FTEST%2Fissues");
+    const google = Array.from(container.querySelectorAll("button"))
+      .find((button) => button.textContent === "Continue with Google") as HTMLButtonElement;
+    expect(google).toBeDefined();
+
+    await act(async () => {
+      google.click();
+    });
+    await flushReact();
+
+    expect(signInGoogleMock).toHaveBeenCalledWith({
+      callbackURL: "/TEST/issues",
+      errorCallbackURL: "/auth?next=%2FTEST%2Fissues",
+    });
+    await act(() => root.unmount());
+  });
+
+  it("explains a Google sign-in rejected because sign-up is disabled", async () => {
+    healthMock.mockResolvedValue({ status: "ok", deploymentMode: "authenticated", googleSignInEnabled: true });
+    const { root } = await mount("/auth?error=signup_disabled");
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain("sign-up is disabled");
+    await act(() => root.unmount());
   });
 });

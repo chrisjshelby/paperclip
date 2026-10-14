@@ -135,6 +135,23 @@ BETTER_AUTH_SECRET=$(openssl rand -hex 32) \
 
 PostgreSQL data persists in a named Docker volume (`pgdata`). Paperclip data persists in `paperclip-data`.
 
+### Google sign-in (optional)
+
+Both compose files pass through `PAPERCLIP_AUTH_GOOGLE_CLIENT_ID` and `PAPERCLIP_AUTH_GOOGLE_CLIENT_SECRET`. When both are set, the sign-in page shows **Continue with Google**; when either is empty, Google sign-in stays off.
+
+1. In Google Cloud Console, create an OAuth client of type **Web application**.
+2. Add the authorized redirect URI `<PAPERCLIP_PUBLIC_URL>/api/auth/callback/google`, for example `http://localhost:3100/api/auth/callback/google` locally or `https://paperclip.example.com/api/auth/callback/google` in production. `PAPERCLIP_PUBLIC_URL` must match the URL users open, or Google rejects the redirect.
+3. Start the stack with the credentials:
+
+```sh
+BETTER_AUTH_SECRET=$(openssl rand -hex 32) \
+PAPERCLIP_AUTH_GOOGLE_CLIENT_ID=<client id> \
+PAPERCLIP_AUTH_GOOGLE_CLIENT_SECRET=<client secret> \
+  docker compose -f docker/docker-compose.yml up --build
+```
+
+New Google users get the same access as new email users: none until they accept a company invite. `PAPERCLIP_AUTH_DISABLE_SIGN_UP=true` also blocks Google from creating new users; users who already signed in with Google keep access. Google sign-in does not merge into an existing password account with the same email unless that account's email is verified, so password users should keep signing in with their password.
+
 ### Untrusted PR review
 
 Isolated container for reviewing untrusted pull requests with Codex or Claude, without exposing your host machine. See `doc/UNTRUSTED-PR-REVIEW.md` for the full workflow.

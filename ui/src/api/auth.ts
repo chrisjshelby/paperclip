@@ -179,6 +179,14 @@ export const authApi = {
     await authPost("/sign-up/email", input);
   },
 
+  /** Returns the Google consent URL; the caller navigates the browser to it. */
+  signInGoogle: async (input: { callbackURL: string; errorCallbackURL: string }): Promise<string> => {
+    const payload = await authPost("/sign-in/social", { provider: "google", disableRedirect: true, ...input });
+    const url = (payload as { url?: unknown } | null)?.url;
+    if (typeof url !== "string") throw new Error("Google sign-in is unavailable");
+    return url;
+  },
+
   getProfile: async (): Promise<CurrentUserProfile> => {
     const res = await fetch("/api/auth/profile", {
       credentials: "include",

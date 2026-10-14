@@ -1,4 +1,5 @@
 import { supportsLocalAiLogin } from "../services/local-ai-login-policy.js";
+import { isGoogleSignInEnabled } from "../auth/google-sign-in.js";
 import { randomUUID, timingSafeEqual } from "node:crypto";
 import { Router } from "express";
 import type { Db } from "@paperclipai/db";
@@ -411,6 +412,7 @@ export function healthRoutes(
         deploymentMode: opts.deploymentMode,
         deploymentExposure: opts.deploymentExposure,
         localAiLoginSupported: supportsLocalAiLogin(opts),
+        googleSignInEnabled: isGoogleSignInEnabled(),
         commit,
         bootstrapStatus,
         bootstrapInviteActive,
@@ -435,6 +437,7 @@ export function healthRoutes(
       deploymentMode: opts.deploymentMode,
       deploymentExposure: opts.deploymentExposure,
         localAiLoginSupported: supportsLocalAiLogin(opts),
+      googleSignInEnabled: isGoogleSignInEnabled(),
       authReady: opts.authReady,
       bootstrapStatus,
       bootstrapInviteActive,

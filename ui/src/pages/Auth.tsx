@@ -16,6 +16,14 @@ import { PaperclipLockup } from "../components/PaperclipLockup";
 
 type AuthMode = "sign_in" | "sign_up";
 
+/** Better Auth sends a failed Google sign-in back here with `?error=<code>`. */
+function googleSignInErrorMessage(code: string | null): string | null {
+  if (!code) return null;
+  if (code === "signup_disabled") return "No account uses this Google address, and sign-up is disabled on this instance.";
+  if (code === "account_not_linked") return "An account with this email already exists. Sign in with your password instead.";
+  return "Google sign-in failed. Try again.";
+}
+
 export function AuthPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -24,7 +32,7 @@ export function AuthPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => googleSignInErrorMessage(searchParams.get("error")));
   const errorId = "auth-error";
 
   const nextPath = useMemo(
@@ -74,6 +82,20 @@ export function AuthPage() {
     },
     onError: (err) => {
       setError(err instanceof Error ? err.message : "Authentication failed");
+    },
+  });
+
+  const googleMutation = useMutation({
+    mutationFn: () =>
+      authApi.signInGoogle({
+        callbackURL: nextPath,
+        errorCallbackURL: `/auth?next=${encodeURIComponent(nextPath)}`,
+      }),
+    onSuccess: (url) => {
+      window.location.assign(url);
+    },
+    onError: (err) => {
+      setError(err instanceof Error ? err.message : "Google sign-in failed");
     },
   });
 
@@ -203,6 +225,18 @@ export function AuthPage() {
                   : "Create Account"}
             </Button>
           </form>
+
+          {healthQuery.data?.googleSignInEnabled && (
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-3 w-full"
+              disabled={googleMutation.isPending}
+              onClick={() => googleMutation.mutate()}
+            >
+              {googleMutation.isPending ? "Redirecting…" : "Continue with Google"}
+            </Button>
+          )}
 
           <div className="mt-5 text-sm text-muted-foreground">
             {mode === "sign_in" ? "Need an account?" : "Already have an account?"}{" "}

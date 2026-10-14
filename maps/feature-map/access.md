@@ -73,8 +73,8 @@ logout alone does not establish that server revocation succeeded.
 
 Scope: ui
 Storybook: Sign-in form, pending and invalid credentials, deployment-mode claim gate, expired claim.
-Production: Authenticate and reload company deep link; sign out and confirm session enforcement; reject invalid bootstrap claim.
-Sources: Source: [Auth.tsx](../../ui/src/pages/Auth.tsx), [BoardClaim.tsx](../../ui/src/pages/BoardClaim.tsx), [board-claim.ts](../../server/src/board-claim.ts). Tests: [Auth.test.tsx](../../ui/src/pages/Auth.test.tsx), [auth-session-route.test.ts](../../server/src/__tests__/auth-session-route.test.ts), [board-claim.test.ts](../../server/src/__tests__/board-claim.test.ts)
+Production: Authenticate and reload company deep link; sign out and confirm session enforcement; reject invalid bootstrap claim; when Google credentials are configured, complete Google sign-in and confirm sign-up lock rejects a new Google user.
+Sources: Source: [Auth.tsx](../../ui/src/pages/Auth.tsx), [BoardClaim.tsx](../../ui/src/pages/BoardClaim.tsx), [board-claim.ts](../../server/src/board-claim.ts), [google-sign-in.ts](../../server/src/auth/google-sign-in.ts). Tests: [Auth.test.tsx](../../ui/src/pages/Auth.test.tsx), [auth-session-route.test.ts](../../server/src/__tests__/auth-session-route.test.ts), [board-claim.test.ts](../../server/src/__tests__/board-claim.test.ts), [google-sign-in.test.ts](../../server/src/__tests__/google-sign-in.test.ts)
 
 #### `membership`
 

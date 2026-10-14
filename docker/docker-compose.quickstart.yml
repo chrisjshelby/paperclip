@@ -41,6 +41,10 @@ services:
 
       # ── Required secret for session signing (generate with: openssl rand -hex 32) ──
       BETTER_AUTH_SECRET: "${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET must be set}"
+
+      # ── Optional Google sign-in; set both to enable (see doc/DOCKER.md) ──
+      PAPERCLIP_AUTH_GOOGLE_CLIENT_ID: "${PAPERCLIP_AUTH_GOOGLE_CLIENT_ID:-}"
+      PAPERCLIP_AUTH_GOOGLE_CLIENT_SECRET: "${PAPERCLIP_AUTH_GOOGLE_CLIENT_SECRET:-}"
     volumes:
       # Persistent data directory (database, agent workspaces, uploads)
       - "${PAPERCLIP_DATA_DIR:-../data/docker-paperclip}:/paperclip"

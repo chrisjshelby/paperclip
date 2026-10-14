@@ -22,6 +22,7 @@ import {
   resolveWorkspaceHandoffLocalKey,
   resolveWorkspaceHandoffLocalWorkspaceId,
 } from "./workspace-login-handoff.js";
+import { resolveGoogleSocialProvider } from "./google-sign-in.js";
 
 export type BetterAuthSessionUser = {
   id: string;
@@ -256,6 +257,7 @@ export function createBetterAuthInstance(db: Db, config: Config, trustedOrigins:
     authPublicBaseUrl: config.authPublicBaseUrl,
     publicUrl,
   });
+  const google = resolveGoogleSocialProvider({ disableSignUp: config.authDisableSignUp });
 
   const authConfig = {
     baseURL: baseUrl,
@@ -275,6 +277,7 @@ export function createBetterAuthInstance(db: Db, config: Config, trustedOrigins:
       requireEmailVerification: false,
       disableSignUp: config.authDisableSignUp,
     },
+    ...(google ? { socialProviders: { google } } : {}),
     rateLimit: buildBetterAuthRateLimitOptions({
       deploymentMode: config.deploymentMode,
       deploymentExposure: config.deploymentExposure,

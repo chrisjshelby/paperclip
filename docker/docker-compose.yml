@@ -40,6 +40,9 @@ services:
       PAPERCLIP_DEPLOYMENT_EXPOSURE: "private"
       PAPERCLIP_PUBLIC_URL: "${PAPERCLIP_PUBLIC_URL:-http://localhost:3100}"
       BETTER_AUTH_SECRET: "${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET must be set}"
+      # Optional Google sign-in; set both to enable (see doc/DOCKER.md)
+      PAPERCLIP_AUTH_GOOGLE_CLIENT_ID: "${PAPERCLIP_AUTH_GOOGLE_CLIENT_ID:-}"
+      PAPERCLIP_AUTH_GOOGLE_CLIENT_SECRET: "${PAPERCLIP_AUTH_GOOGLE_CLIENT_SECRET:-}"
     volumes:
       - paperclip-data:/paperclip
     depends_on:
